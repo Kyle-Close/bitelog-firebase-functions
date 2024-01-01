@@ -1,0 +1,2 @@
+export GOOGLE_APPLICATION_CREDENTIALS="/Users/kyleclose/Downloads/auth-blog-practice-c0c539330102.json"
+
