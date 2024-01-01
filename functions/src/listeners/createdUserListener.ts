@@ -1,13 +1,15 @@
 import * as functions from 'firebase-functions';
 import { Pool } from 'pg';
 import { pool } from '../db/db';
-import { UserRecord } from 'firebase-admin/auth';
+import { UserRecord, getAuth } from 'firebase-admin/auth';
 
 export const onUserCreated = functions.auth.user().onCreate(async (user) => {
-  // Your code to run when a user is created
-  console.log(`User created: ${user.uid}`);
-
   await addUserToDB(pool, user);
+  await addUserJournal(pool, user);
+
+  // Give user default permissions
+  const defaultRole = { role: 'user' };
+  await getAuth().setCustomUserClaims(user.uid, defaultRole);
 });
 
 const addUserToDB = async (pool: Pool, user: UserRecord) => {
@@ -28,5 +30,18 @@ const addUserToDB = async (pool: Pool, user: UserRecord) => {
     }
   } catch (err) {
     console.error('Error in addUserToDB:', err);
+  }
+};
+
+const addUserJournal = async (pool: Pool, user: UserRecord) => {
+  try {
+    // Create a new journal entry and link it to user
+    const tableName = 'journals';
+    const tableColumns = ['user_id', 'name'].join(',');
+
+    const query = `INSERT INTO ${tableName} (${tableColumns}) VALUES ('${user.uid}', NULL)`;
+    await pool.query(query);
+  } catch (err) {
+    console.log(err);
   }
 };
