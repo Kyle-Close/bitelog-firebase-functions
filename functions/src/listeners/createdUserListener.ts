@@ -15,12 +15,12 @@ export const onUserCreated = functions.auth.user().onCreate(async (user) => {
 const addUserToDB = async (pool: Pool, user: UserRecord) => {
   try {
     const tableName = 'Users';
-    const columns = 'id, username, email, created_on';
+    const columns = `"id", "username", "email", "createdAt", "updatedAt"`;
 
     const { uid, displayName, email } = user;
-    const values = `'${uid}', '${displayName}', '${email}', NOW()`;
+    const values = `'${uid}', '${displayName}', '${email}', NOW(), NOW()`;
 
-    const query = `INSERT INTO ${tableName} (${columns}) VALUES (${values})`;
+    const query = `INSERT INTO "${tableName}" (${columns}) VALUES (${values})`;
     console.log('Query:', query);
 
     const response = await pool.query(query);
@@ -36,10 +36,10 @@ const addUserToDB = async (pool: Pool, user: UserRecord) => {
 const addUserJournal = async (pool: Pool, user: UserRecord) => {
   try {
     // Create a new journal entry and link it to user
-    const tableName = 'journals';
-    const tableColumns = ['user_id', 'name'].join(',');
+    const tableName = 'Journals';
+    const tableColumns = [`"userId"`, '"name"'].join(',');
 
-    const query = `INSERT INTO ${tableName} (${tableColumns}) VALUES ('${user.uid}', NULL)`;
+    const query = `INSERT INTO "${tableName}" (${tableColumns}) VALUES ('${user.uid}', NULL)`;
     await pool.query(query);
   } catch (err) {
     console.log(err);
