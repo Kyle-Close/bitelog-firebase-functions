@@ -37,9 +37,11 @@ const addUserJournal = async (pool: Pool, user: UserRecord) => {
   try {
     // Create a new journal entry and link it to user
     const tableName = 'Journals';
-    const tableColumns = [`"userId"`, '"name"'].join(',');
+    const tableColumns = [`"UserId"`, '"name", "createdAt", "updatedAt"'].join(
+      ','
+    );
 
-    const query = `INSERT INTO "${tableName}" (${tableColumns}) VALUES ('${user.uid}', NULL)`;
+    const query = `INSERT INTO "${tableName}" (${tableColumns}) VALUES ('${user.uid}', NULL, NOW(), NOW())`;
     await pool.query(query);
   } catch (err) {
     console.log(err);
